@@ -31,6 +31,13 @@ public class URIConstans {
     public static final String TARGET_URL = "targetUrl";
 
     /**
+     * tunnel server向 tunnel client请求http代理时的请求体
+     *
+     * @see com.alibaba.arthas.tunnel.common.MethodConstants#HTTP_PROXY
+     */
+    public static final String REQ_BODY = "reqBody";
+
+    /**
      * 标识一次proxy请求，随机生成
      */
     public static final String PROXY_REQUEST_ID = "requestId";

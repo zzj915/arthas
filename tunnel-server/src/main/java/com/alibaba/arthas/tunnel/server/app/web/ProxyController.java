@@ -1,14 +1,15 @@
 package com.alibaba.arthas.tunnel.server.app.web;
 
-import java.net.URI;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.alibaba.arthas.tunnel.common.CodecUtil;
+import com.alibaba.arthas.tunnel.common.MethodConstants;
+import com.alibaba.arthas.tunnel.common.SimpleHttpResponse;
+import com.alibaba.arthas.tunnel.common.URIConstans;
+import com.alibaba.arthas.tunnel.server.AgentInfo;
+import com.alibaba.arthas.tunnel.server.TunnelServer;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.util.concurrent.GlobalEventExecutor;
+import io.netty.util.concurrent.Promise;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,21 +18,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.alibaba.arthas.tunnel.common.MethodConstants;
-import com.alibaba.arthas.tunnel.common.SimpleHttpResponse;
-import com.alibaba.arthas.tunnel.common.URIConstans;
-import com.alibaba.arthas.tunnel.server.AgentInfo;
-import com.alibaba.arthas.tunnel.server.TunnelServer;
-
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.netty.util.concurrent.GlobalEventExecutor;
-import io.netty.util.concurrent.Promise;
+import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * 代理http请求到具体的 arthas agent里
@@ -49,7 +48,8 @@ public class ProxyController {
     @RequestMapping(value = "/proxy/{agentId}/**")
     @ResponseBody
     public ResponseEntity<?> execute(@PathVariable(name = "agentId", required = true) String agentId,
-            HttpServletRequest request) throws InterruptedException, ExecutionException, TimeoutException {
+                                     @RequestBody String reqBody,
+                                     HttpServletRequest request) throws InterruptedException, ExecutionException, TimeoutException {
 
         String fullPath = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         String targetUrl = fullPath.substring("/proxy/".length() + agentId.length());
@@ -67,9 +67,13 @@ public class ProxyController {
 
             tunnelServer.addProxyRequestPromise(requestId, httpResponsePromise);
 
-            URI uri = UriComponentsBuilder.newInstance().scheme(URIConstans.RESPONSE).path("/")
-                    .queryParam(URIConstans.METHOD, MethodConstants.HTTP_PROXY).queryParam(URIConstans.ID, agentId)
-                    .queryParam(URIConstans.TARGET_URL, targetUrl).queryParam(URIConstans.PROXY_REQUEST_ID, requestId)
+            URI uri = UriComponentsBuilder.newInstance()
+                    .scheme(URIConstans.RESPONSE).path("/")
+                    .queryParam(URIConstans.METHOD, MethodConstants.HTTP_PROXY)
+                    .queryParam(URIConstans.ID, agentId)
+                    .queryParam(URIConstans.TARGET_URL, targetUrl)
+                    .queryParam(URIConstans.PROXY_REQUEST_ID, requestId)
+                    .queryParam(URIConstans.REQ_BODY, CodecUtil.encodeBase64(reqBody))
                     .build().toUri();
 
             agentCtx.channel().writeAndFlush(new TextWebSocketFrame(uri.toString()));
