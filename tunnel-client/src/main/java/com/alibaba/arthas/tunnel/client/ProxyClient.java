@@ -1,44 +1,24 @@
 package com.alibaba.arthas.tunnel.client;
 
-import java.io.UnsupportedEncodingException;
-import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.alibaba.arthas.tunnel.common.CodecUtil;
 import com.alibaba.arthas.tunnel.common.SimpleHttpResponse;
 import com.taobao.arthas.common.ArthasConstants;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.*;
 import io.netty.channel.local.LocalAddress;
 import io.netty.channel.local.LocalChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.HttpClientCodec;
-import io.netty.handler.codec.http.HttpContent;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpHeaderValues;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpObject;
-import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpResponse;
-import io.netty.handler.codec.http.HttpVersion;
-import io.netty.handler.codec.http.LastHttpContent;
+import io.netty.handler.codec.http.*;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import io.netty.util.concurrent.Promise;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.UnsupportedEncodingException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 
@@ -48,7 +28,7 @@ import io.netty.util.concurrent.Promise;
 public class ProxyClient {
     private static final Logger logger = LoggerFactory.getLogger(ProxyClient.class);
 
-    public SimpleHttpResponse query(String targetUrl) throws InterruptedException {
+    public SimpleHttpResponse query(String targetUrl, String reqBody) throws InterruptedException {
         final Promise<SimpleHttpResponse> httpResponsePromise = GlobalEventExecutor.INSTANCE.newPromise();
 
         final EventLoopGroup group = new NioEventLoopGroup(1, new DefaultThreadFactory("arthas-ProxyClient", true));
@@ -69,8 +49,14 @@ public class ProxyClient {
             Channel localChannel = b.connect(localAddress).sync().channel();
 
             // Prepare the HTTP request.
-            HttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, targetUrl,
-                    Unpooled.EMPTY_BUFFER);
+            HttpRequest request = null;
+            if (reqBody == null || reqBody.isEmpty()) {
+                request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, targetUrl,
+                        Unpooled.EMPTY_BUFFER);
+            } else {
+                request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, targetUrl,
+                        Unpooled.wrappedBuffer(CodecUtil.decodeBase64(reqBody)));
+            }
             request.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
 
             localChannel.writeAndFlush(request);

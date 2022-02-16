@@ -1,18 +1,9 @@
 
 package com.alibaba.arthas.tunnel.client;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.alibaba.arthas.tunnel.common.MethodConstants;
 import com.alibaba.arthas.tunnel.common.SimpleHttpResponse;
 import com.alibaba.arthas.tunnel.common.URIConstans;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
@@ -27,6 +18,13 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.CharsetUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 
@@ -105,6 +103,7 @@ public class TunnelClientSocketClientHandler extends SimpleChannelInboundHandler
                  */
                 ProxyClient proxyClient = new ProxyClient();
                 List<String> targetUrls = parameters.get(URIConstans.TARGET_URL);
+                List<String> reqBodies = parameters.get(URIConstans.REQ_BODY);
 
                 List<String> requestIDs = parameters.get(URIConstans.PROXY_REQUEST_ID);
                 String id = null;
@@ -118,7 +117,11 @@ public class TunnelClientSocketClientHandler extends SimpleChannelInboundHandler
 
                 if (targetUrls != null && !targetUrls.isEmpty()) {
                     String targetUrl = targetUrls.get(0);
-                    SimpleHttpResponse simpleHttpResponse = proxyClient.query(targetUrl);
+                    String reqBody = null;
+                    if (reqBodies != null && !reqBodies.isEmpty()) {
+                        reqBody = reqBodies.get(0);
+                    }
+                    SimpleHttpResponse simpleHttpResponse = proxyClient.query(targetUrl, reqBody);
 
                     ByteBuf byteBuf = Base64
                             .encode(Unpooled.wrappedBuffer(SimpleHttpResponse.toBytes(simpleHttpResponse)));
