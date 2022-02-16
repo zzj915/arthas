@@ -1,0 +1,60 @@
+
+server:
+  port: 8000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: arthas
+
+# spring
+spring:
+  config:
+    activate:
+      on-profile: dev
+  output.ansi.enabled: ALWAYS
+
+  cache:
+    type: caffeine
+    cache-names: inMemoryClusterCache
+    caffeine:
+      spec: maximumSize=3000,expireAfterAccess=3600s
+
+#  redis:
+#    host: 192.168.100.115
+#    port: 6379
+#    password: zoomlgd
+#    database: 0
+  jackson:
+    default-property-inclusion: non_null
+
+logging:
+  config: classpath:logback-spring.xml
+  path: /var/tmp/logs
+  level:
+    root: INFO
+    console: DEBUG
+
+# zoomlgd
+zoomlgd:
+  # 微服务配置
+  service:
+    tokens:
+      - id: zoomlgd-bop
+        verifyUrl: http://zoomlgd-bop/uc/access/validateToken?jwtToken={jwtToken}
+  security:
+    type: gateway # none, gateway
+    white-list:
+      apis:
+        - /hello/**
+      clients:
+        - 192.168.4.101
+        - 192.168.4.102
+        - 192.168.4.103
+        - 192.168.3.253
+
+arthas:
+  server:
+    host: 0.0.0.0
+    port: 7777

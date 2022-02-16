@@ -1,0 +1,15 @@
+
+spring:
+  application:
+    name: arthas-tunnel-server
+  profiles:
+    active: ${SPRING_PROFILE_ACTIVE:dev}
+  cloud:
+    inetutils:
+      preferred-networks: ${SPRING_PREFERRED_NETWORKS:192.168.3}
+    nacos:
+      discovery:
+        server-addr: ${SPRING_DISCOVERY_URI:192.168.4.101:8848}
+      config:
+        server-addr: ${SPRING_CONFIG_URI:192.168.4.101:8848}
+        file-extension: yml
