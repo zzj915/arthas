@@ -48,7 +48,7 @@ public class ProxyController {
     @RequestMapping(value = "/proxy/{agentId}/**")
     @ResponseBody
     public ResponseEntity<?> execute(@PathVariable(name = "agentId", required = true) String agentId,
-                                     @RequestBody String requestBody,
+                                     @RequestBody(required = false) String requestBody,
                                      HttpServletRequest request) throws InterruptedException, ExecutionException, TimeoutException {
 
         String fullPath = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);

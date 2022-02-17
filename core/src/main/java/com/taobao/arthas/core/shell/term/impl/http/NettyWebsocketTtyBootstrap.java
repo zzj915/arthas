@@ -2,7 +2,6 @@ package com.taobao.arthas.core.shell.term.impl.http;
 
 import com.taobao.arthas.common.ArthasConstants;
 import com.taobao.arthas.core.shell.term.impl.http.session.HttpSessionManager;
-
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -15,11 +14,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import io.netty.util.concurrent.DefaultThreadFactory;
-import io.netty.util.concurrent.EventExecutorGroup;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
-import io.netty.util.concurrent.ImmediateEventExecutor;
+import io.netty.util.concurrent.*;
 import io.termd.core.function.Consumer;
 import io.termd.core.tty.TtyConnection;
 import io.termd.core.util.CompletableFuture;
@@ -93,7 +88,8 @@ public class NettyWebsocketTtyBootstrap {
                 .childHandler(new LocalTtyServerInitializer(channelGroup, handler, workerGroup));
 
         ChannelFuture bindLocalFuture = b2.bind(new LocalAddress(ArthasConstants.NETTY_LOCAL_ADDRESS));
-        if (this.port < 0) { // 保证回调doneHandler
+        // 保证回调doneHandler
+        if (this.port < 0) {
             bindLocalFuture.addListener(new GenericFutureListener<Future<? super Void>>() {
                 @Override
                 public void operationComplete(Future<? super Void> future) throws Exception {

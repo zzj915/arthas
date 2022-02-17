@@ -123,9 +123,9 @@ public class TunnelClientSocketClientHandler extends SimpleChannelInboundHandler
                         logger.info("requestBody: {}", requestBody);
                     }
                     SimpleHttpResponse simpleHttpResponse = proxyClient.query(targetUrl, requestBody);
+                    logger.info("proxyClient.query response 1: {}", new String(simpleHttpResponse.getContent()));
 
-                    ByteBuf byteBuf = Base64
-                            .encode(Unpooled.wrappedBuffer(SimpleHttpResponse.toBytes(simpleHttpResponse)));
+                    ByteBuf byteBuf = Base64.encode(Unpooled.wrappedBuffer(SimpleHttpResponse.toBytes(simpleHttpResponse)));
                     String requestData = byteBuf.toString(CharsetUtil.UTF_8);
 
                     QueryStringEncoder queryEncoder = new QueryStringEncoder("");

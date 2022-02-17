@@ -156,6 +156,7 @@ public class HttpApiHandler {
     }
 
     public void onCompleted(DefaultFullHttpResponse httpResponse) {
+        logger.info("HttpApiHandler: 到这里了");
         ByteBuf content = httpResponse.content();
         content.clear();
         if (content.capacity() == jsonBufferSize) {

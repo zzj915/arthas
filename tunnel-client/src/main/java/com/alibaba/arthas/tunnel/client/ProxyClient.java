@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 public class ProxyClient {
     private static final Logger logger = LoggerFactory.getLogger(ProxyClient.class);
 
-    public SimpleHttpResponse query(String targetUrl, String reqBody) throws InterruptedException {
+    public SimpleHttpResponse query(String targetUrl, String requestBody) throws InterruptedException {
         final Promise<SimpleHttpResponse> httpResponsePromise = GlobalEventExecutor.INSTANCE.newPromise();
 
         final EventLoopGroup group = new NioEventLoopGroup(1, new DefaultThreadFactory("arthas-ProxyClient", true));
@@ -49,13 +49,15 @@ public class ProxyClient {
             Channel localChannel = b.connect(localAddress).sync().channel();
 
             // Prepare the HTTP request.
-            HttpRequest request = null;
-            if (reqBody == null || reqBody.isEmpty()) {
-                request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, targetUrl,
-                        Unpooled.EMPTY_BUFFER);
+            DefaultFullHttpRequest request = null;
+            if (requestBody == null || requestBody.isEmpty()) {
+                request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, targetUrl, Unpooled.EMPTY_BUFFER);
             } else {
-                request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, targetUrl,
-                        Unpooled.wrappedBuffer(CodecUtil.decodeBase64(reqBody)));
+                logger.info("requestBody decoded: {}", new String(CodecUtil.decodeBase64(requestBody)));
+                ByteBuf content = Unpooled.wrappedBuffer(CodecUtil.decodeBase64(requestBody));
+                request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, targetUrl, content);
+                logger.info("requestBody readableBytes length: {}", request.content().readableBytes());
+                request.headers().set(HttpHeaderNames.CONTENT_LENGTH, request.content().readableBytes());
             }
             request.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
 
