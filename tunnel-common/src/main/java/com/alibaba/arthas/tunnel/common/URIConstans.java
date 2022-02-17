@@ -35,7 +35,7 @@ public class URIConstans {
      *
      * @see com.alibaba.arthas.tunnel.common.MethodConstants#HTTP_PROXY
      */
-    public static final String REQ_BODY = "reqBody";
+    public static final String PROXY_REQUEST_BODY = "requestBody";
 
     /**
      * 标识一次proxy请求，随机生成

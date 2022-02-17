@@ -48,7 +48,7 @@ public class ProxyController {
     @RequestMapping(value = "/proxy/{agentId}/**")
     @ResponseBody
     public ResponseEntity<?> execute(@PathVariable(name = "agentId", required = true) String agentId,
-                                     @RequestBody String reqBody,
+                                     @RequestBody String requestBody,
                                      HttpServletRequest request) throws InterruptedException, ExecutionException, TimeoutException {
 
         String fullPath = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
@@ -73,7 +73,7 @@ public class ProxyController {
                     .queryParam(URIConstans.ID, agentId)
                     .queryParam(URIConstans.TARGET_URL, targetUrl)
                     .queryParam(URIConstans.PROXY_REQUEST_ID, requestId)
-                    .queryParam(URIConstans.REQ_BODY, CodecUtil.encodeBase64(reqBody))
+                    .queryParam(URIConstans.PROXY_REQUEST_BODY, CodecUtil.encodeBase64(requestBody))
                     .build().toUri();
 
             agentCtx.channel().writeAndFlush(new TextWebSocketFrame(uri.toString()));

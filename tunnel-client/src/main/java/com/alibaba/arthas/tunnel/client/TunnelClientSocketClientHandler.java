@@ -103,7 +103,7 @@ public class TunnelClientSocketClientHandler extends SimpleChannelInboundHandler
                  */
                 ProxyClient proxyClient = new ProxyClient();
                 List<String> targetUrls = parameters.get(URIConstans.TARGET_URL);
-                List<String> reqBodies = parameters.get(URIConstans.REQ_BODY);
+                List<String> requestBodies = parameters.get(URIConstans.PROXY_REQUEST_BODY);
 
                 List<String> requestIDs = parameters.get(URIConstans.PROXY_REQUEST_ID);
                 String id = null;
@@ -117,11 +117,12 @@ public class TunnelClientSocketClientHandler extends SimpleChannelInboundHandler
 
                 if (targetUrls != null && !targetUrls.isEmpty()) {
                     String targetUrl = targetUrls.get(0);
-                    String reqBody = null;
-                    if (reqBodies != null && !reqBodies.isEmpty()) {
-                        reqBody = reqBodies.get(0);
+                    String requestBody = null;
+                    if (requestBodies != null && !requestBodies.isEmpty()) {
+                        requestBody = requestBodies.get(0);
+                        logger.info("requestBody: {}", requestBody);
                     }
-                    SimpleHttpResponse simpleHttpResponse = proxyClient.query(targetUrl, reqBody);
+                    SimpleHttpResponse simpleHttpResponse = proxyClient.query(targetUrl, requestBody);
 
                     ByteBuf byteBuf = Base64
                             .encode(Unpooled.wrappedBuffer(SimpleHttpResponse.toBytes(simpleHttpResponse)));
