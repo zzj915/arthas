@@ -2,6 +2,8 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+echo $DIR
+
 get_local_maven_project_version()
 {
     "$DIR/mvnw" -T 2C -Dmaven.test.skip=true -DskipTests=true -Dmaven.javadoc.skip=true org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate \
