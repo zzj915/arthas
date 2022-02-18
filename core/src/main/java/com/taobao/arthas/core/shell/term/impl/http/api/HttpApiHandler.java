@@ -132,7 +132,7 @@ public class HttpApiHandler {
 
             //create http response
             DefaultFullHttpResponse response = new DefaultFullHttpResponse(request.protocolVersion(),
-                    HttpResponseStatus.OK, content.retain());
+                    HttpResponseStatus.OK, content.clear().retain());
             response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/json; charset=utf-8");
             writeResult(response, result);
             return response;
@@ -158,7 +158,7 @@ public class HttpApiHandler {
     public void onCompleted(DefaultFullHttpResponse httpResponse) {
         logger.info("HttpApiHandler: 到这里了");
         ByteBuf content = httpResponse.content();
-        content.clear();
+//        content.clear();
         if (content.capacity() == jsonBufferSize) {
             if (!byteBufPool.offer(content)) {
                 content.release();
