@@ -73,7 +73,7 @@ public class ProxyController {
                     .queryParam(URIConstans.ID, agentId)
                     .queryParam(URIConstans.TARGET_URL, targetUrl)
                     .queryParam(URIConstans.PROXY_REQUEST_ID, requestId)
-                    .queryParam(URIConstans.PROXY_REQUEST_BODY, CodecUtil.encodeBase64(requestBody))
+                    .queryParam(URIConstans.PROXY_REQUEST_BODY, requestBody == null ? null : CodecUtil.encodeBase64(requestBody))
                     .build().toUri();
 
             agentCtx.channel().writeAndFlush(new TextWebSocketFrame(uri.toString()));
