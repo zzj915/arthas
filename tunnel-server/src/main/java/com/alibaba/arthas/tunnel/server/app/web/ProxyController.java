@@ -54,7 +54,7 @@ public class ProxyController {
         String fullPath = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         String targetUrl = fullPath.substring("/proxy/".length() + agentId.length());
 
-        logger.info("http proxy, agentId: {}, targetUrl: {}", agentId, targetUrl);
+        logger.info("http proxy, agentId: {}, targetUrl: {}, requestBody: {}", agentId, targetUrl, requestBody);
 
         Optional<AgentInfo> findAgent = tunnelServer.findAgent(agentId);
 
