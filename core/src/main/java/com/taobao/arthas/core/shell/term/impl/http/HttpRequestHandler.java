@@ -10,7 +10,6 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
-import io.netty.util.CharsetUtil;
 import io.termd.core.http.HttpTtyConnection;
 import io.termd.core.util.Logging;
 
@@ -52,7 +51,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
-        logger.info("HttpRequestHandler: {}", request.content().toString(CharsetUtil.UTF_8));
+//        logger.info("HttpRequestHandler: {}", request.content().toString(CharsetUtil.UTF_8));
         String path = new URI(request.uri()).getPath();
         if (wsUri.equalsIgnoreCase(path)) {
             ctx.fireChannelRead(request.retain());
@@ -72,7 +71,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
                 //handle http restful api
                 if ("/api".equals(path)) {
                     response = httpApiHandler.handle(ctx, request);
-                    logger.info("HttpRequestHandler httpApiHandler response: {}", ((DefaultFullHttpResponse)response).content().toString(CharsetUtil.UTF_8));
+//                    logger.info("HttpRequestHandler httpApiHandler response: {}", ((DefaultFullHttpResponse)response).content().toString(CharsetUtil.UTF_8));
                     isHttpApiResponse = true;
                 }
 

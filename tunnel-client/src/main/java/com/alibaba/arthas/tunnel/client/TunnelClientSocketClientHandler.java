@@ -120,10 +120,9 @@ public class TunnelClientSocketClientHandler extends SimpleChannelInboundHandler
                     String requestBody = null;
                     if (requestBodies != null && !requestBodies.isEmpty()) {
                         requestBody = requestBodies.get(0);
-                        logger.info("requestBody: {}", requestBody);
                     }
                     SimpleHttpResponse simpleHttpResponse = proxyClient.query(targetUrl, requestBody);
-                    logger.info("proxyClient.query response 1: {}", new String(simpleHttpResponse.getContent()));
+//                    logger.info("proxyClient.query response 1: {}", new String(simpleHttpResponse.getContent()));
 
                     ByteBuf byteBuf = Base64.encode(Unpooled.wrappedBuffer(SimpleHttpResponse.toBytes(simpleHttpResponse)));
                     String requestData = byteBuf.toString(CharsetUtil.UTF_8);

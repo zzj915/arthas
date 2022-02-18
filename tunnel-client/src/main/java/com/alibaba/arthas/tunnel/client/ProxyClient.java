@@ -40,7 +40,8 @@ public class ProxyClient {
                 @Override
                 protected void initChannel(LocalChannel ch) {
                     ChannelPipeline p = ch.pipeline();
-                    p.addLast(new HttpClientCodec(), new HttpObjectAggregator(ArthasConstants.MAX_HTTP_CONTENT_LENGTH),
+                    p.addLast(new HttpClientCodec(),
+                            new HttpObjectAggregator(ArthasConstants.MAX_HTTP_CONTENT_LENGTH),
                             new HttpProxyClientHandler(httpResponsePromise));
                 }
             });
@@ -56,7 +57,6 @@ public class ProxyClient {
                 logger.info("requestBody decoded: {}", new String(CodecUtil.decodeBase64(requestBody)));
                 ByteBuf content = Unpooled.wrappedBuffer(CodecUtil.decodeBase64(requestBody));
                 request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, targetUrl, content);
-                logger.info("requestBody readableBytes length: {}", request.content().readableBytes());
                 request.headers().set(HttpHeaderNames.CONTENT_LENGTH, request.content().readableBytes());
             }
             request.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
